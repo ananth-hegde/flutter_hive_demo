@@ -1,38 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import '../models/student_model.dart';
+import '../models/teacher_model.dart';
 import 'dart:io';
-import 'add_student_page.dart';
-import 'update_student_page.dart';
+import 'add_teacher_page.dart';
+import 'update_teacher_page.dart';
 
-const studentDbName = 'students';
+const teacherDbName = 'teachers';
 
-class StudentPage extends StatefulWidget {
+class TeacherPage extends StatefulWidget {
   
   @override
-  _StudentPageState createState() => _StudentPageState();
+  _TeacherPageState createState() => _TeacherPageState();
 }
 
-class _StudentPageState extends State<StudentPage> {
+class _TeacherPageState extends State<TeacherPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Hive Demo - Students'),
+        title: Text('Hive Demo - Teachers'),
       ),
       body: Center(
         child: ValueListenableBuilder(
-          valueListenable: Hive.box<Student>(studentDbName).listenable(),
-          builder: (context, Box<Student> box, _) {
+          valueListenable: Hive.box<Teacher>(teacherDbName).listenable(),
+          builder: (context, Box<Teacher> box, _) {
             if (box.values.isEmpty)
               return Center(
-                child: Text("No Students"),
+                child: Text("No Teachers"),
               );
             return ListView.builder(
               itemCount: box.values.length,
               itemBuilder: (context, index) {
-                Student currentStudent = box.getAt(index);
+                Teacher currentTeacher = box.getAt(index);
                 return Card(
                   clipBehavior: Clip.antiAlias,
                   child: InkWell(
@@ -46,21 +46,21 @@ class _StudentPageState extends State<StudentPage> {
                             children: <Widget>[
                               SizedBox(height: 5),
                               Text(
-                                'Name: ' + currentStudent.name,
+                                'Name: ' + currentTeacher.name,
                                 style: TextStyle(
                                   fontSize: 20.0,
                                 ),
                               ),
                               SizedBox(height: 5),
                               Text(
-                                'Description: ' + currentStudent.description,
+                                'Description: ' + currentTeacher.description,
                                 style: TextStyle(
                                   fontSize: 20.0,
                                 ),
                               ),
                               SizedBox(height: 5),
                               Image.file(
-                                File(currentStudent.pathToImage),
+                                File(currentTeacher.pathToImage),
                                 fit: BoxFit.cover,
                                 height: 150.0,
                                 width: 150.0,
@@ -72,7 +72,7 @@ class _StudentPageState extends State<StudentPage> {
                             onPressed: () {
                               Navigator.of(context).push(MaterialPageRoute(
                                   builder: (context) =>
-                                      UpdateStudent(index: index)));
+                                      UpdateTeacher(index: index)));
                             },
                             child: Icon(Icons.edit),
                           ),
@@ -95,7 +95,7 @@ class _StudentPageState extends State<StudentPage> {
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
         onPressed: (){
-          Navigator.of(context).push(MaterialPageRoute(builder: (context)=>AddStudent()));
+          Navigator.of(context).push(MaterialPageRoute(builder: (context)=>AddTeacher()));
         },
       ),
     );

@@ -5,8 +5,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'dart:io';
 import '../repositories/teacher_store.dart';
-const teacherDbName = 'teachers';
-
 
 final teacherStore = TeacherStore();
 class AddTeacher extends StatefulWidget {
@@ -21,20 +19,13 @@ class _AddTeacherState extends State<AddTeacher> {
   void onFormSubmit() {
     if (widget.formKey.currentState.validate()) {
       
-      Box<Teacher> teacherBox = Hive.box<Teacher>(teacherDbName);
-      teacherBox.add(Teacher(teacherStore.name, teacherStore.description,teacherStore.
-      pathToImage));
+      teacherStore.addTeacher();
       Navigator.of(context).pop();
     }
   }
   void _uploadImage() async {
-
     final _picker = ImagePicker();
-
     var _pickedImage = await _picker.getImage(source: ImageSource.gallery);
-
-    
-
     teacherStore.changeImagePath(_pickedImage.path);
     
   }

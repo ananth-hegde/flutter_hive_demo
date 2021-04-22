@@ -6,8 +6,8 @@ import '../repositories/student_store.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'dart:io';
 
-const studentDbName = 'students';
 final studentStore = StudentStore();
+
 class AddStudent extends StatefulWidget {
   final formKey = GlobalKey<FormState>();
   @override
@@ -17,20 +17,17 @@ class AddStudent extends StatefulWidget {
 class _AddStudentState extends State<AddStudent> {
   void onFormSubmit() {
     if (widget.formKey.currentState.validate()) {
-      Box<Student> studentBox = Hive.box<Student>(studentDbName);
-      studentBox.add(Student(studentStore.name, studentStore.description,studentStore.pathToImage));
+      studentStore.addStudent();
       Navigator.of(context).pop();
     }
   }
+
   void _uploadImage() async {
-
     final _picker = ImagePicker();
-
     var _pickedImage = await _picker.getImage(source: ImageSource.gallery);
-
     studentStore.changeImagePath(_pickedImage.path);
-    
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -60,44 +57,36 @@ class _AddStudentState extends State<AddStudent> {
                       labelText: "Description",
                     ),
                     onChanged: (value) {
-                        studentStore.changeDescription(value);
-                      
+                      studentStore.changeDescription(value);
                     },
                   ),
-                  Observer(
-                    builder: (_){
-                      if(studentStore.pathToImage!=null)
-                      {
-                        File f = File(studentStore.pathToImage);
+                  Observer(builder: (_) {
+                    if (studentStore.pathToImage != null) {
+                      File f = File(studentStore.pathToImage);
                       print(f.existsSync());
-                        if(f.existsSync()==true)
-                        {
-                          return Center(
-                            child: Image.file(
-                                    File(studentStore.pathToImage),
-                                    fit: BoxFit.cover,
-                                    height: 150.0,
-                                    width: 150.0,
-                                    
-                                  ),
-                          );
-                        }
-                        else
+                      if (f.existsSync() == true) {
+                        return Center(
+                          child: Image.file(
+                            File(studentStore.pathToImage),
+                            fit: BoxFit.cover,
+                            height: 150.0,
+                            width: 150.0,
+                          ),
+                        );
+                      } else
                         return Container(
                           child: Text(''),
                         );
-                      }
-                      else
-                        return Container(
-                          child: Text(''),
-                        );
-                    }
-                  ),
+                    } else
+                      return Container(
+                        child: Text(''),
+                      );
+                  }),
                   TextButton(
-                    child: Center(child: Padding(
+                    child: Center(
+                        child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Text('Upload image'),
-                      
                     )),
                     onPressed: _uploadImage,
                   ),
@@ -111,8 +100,6 @@ class _AddStudentState extends State<AddStudent> {
           ),
         ),
       ),
-      
     );
   }
 }
-

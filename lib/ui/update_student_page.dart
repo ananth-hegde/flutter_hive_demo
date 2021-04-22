@@ -17,16 +17,13 @@ class UpdateStudent extends StatefulWidget {
 
 class _UpdateStudentState extends State<UpdateStudent> {
   
-  Box<Student> studentBox = Hive.box<Student>(studentDbName);
   @override
   initState(){
     super.initState();
-    studentStore.name = studentBox.getAt(widget.index).name;
-    studentStore.description = studentBox.getAt(widget.index).description;
-    studentStore.pathToImage = studentBox.getAt(widget.index).pathToImage;
+    studentStore.setDataFromIndex(widget.index);
   }
   onFormSubmit(){
-    studentBox.putAt(widget.index,Student(studentStore.name,studentStore.description,studentStore.pathToImage));
+    studentStore.updateStudent(widget.index);
     Navigator.of(context).pop();
   }
 

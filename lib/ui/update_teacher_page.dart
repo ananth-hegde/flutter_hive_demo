@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
-import '../models/teacher_model.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'dart:io';
@@ -31,13 +29,51 @@ class _UpdateTeacherState extends State<UpdateTeacher> {
     Navigator.of(context).pop();
   }
 
-  void _uploadImage() async {
+  void _showPicker(context){
+    showModalBottomSheet(
+      context: context, 
+      builder: (BuildContext _){
+        return SafeArea(
+          child: Container(
+            child: Wrap(
+              children: <Widget>[
+                ListTile(
+                  leading: Icon(Icons.photo_library),
+                  title: Text('Gallery'),
+                  onTap: (){
+                    _uploadImage('gallery');
+                    Navigator.of(context).pop();
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.camera),
+                  title: Text('Camera'),
+                  onTap: (){
+                    _uploadImage('camera');
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            )
+          ),
+        );
+      }
+    );
+  }
 
+  void _uploadImage(String type) async {
+    var _pickedImage;
+    
     final _picker = ImagePicker();
-
-    var _pickedImage = await _picker.getImage(source: ImageSource.gallery);
-
-    teacherStore.changeImagePath(_pickedImage.path);
+    if(type=='camera')
+    {
+      _pickedImage = await _picker.getImage(source: ImageSource.camera);
+    }
+    else{
+      _pickedImage = await _picker.getImage(source: ImageSource.gallery);
+    }
+    if(_pickedImage!=null)
+      teacherStore.changeImagePath(_pickedImage.path);
     
   }
   @override
@@ -106,7 +142,9 @@ class _UpdateTeacherState extends State<UpdateTeacher> {
                       child: Text('Upload image'),
                       
                     )),
-                    onPressed: _uploadImage,
+                    onPressed: (){
+                      _showPicker(context);
+                    },
                   ),
                   OutlinedButton(
                     child: Text("Update"),

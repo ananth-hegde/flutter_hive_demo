@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
+
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'dart:io';
 import '../repositories/student_store.dart';
-import '../models/student_model.dart';
+
 const studentDbName = 'students';
 final studentStore = StudentStore();
 class UpdateStudent extends StatefulWidget {
@@ -22,18 +22,56 @@ class _UpdateStudentState extends State<UpdateStudent> {
     super.initState();
     studentStore.setDataFromIndex(widget.index);
   }
-  onFormSubmit(){
+  _onFormSubmit(){
     studentStore.updateStudent(widget.index);
     Navigator.of(context).pop();
   }
 
-  void _uploadImage() async {
+  void _showPicker(context){
+    showModalBottomSheet(
+      context: context, 
+      builder: (BuildContext _){
+        return SafeArea(
+          child: Container(
+            child: Wrap(
+              children: <Widget>[
+                ListTile(
+                  leading: Icon(Icons.photo_library),
+                  title: Text('Gallery'),
+                  onTap: (){
+                    _uploadImage('gallery');
+                    Navigator.of(context).pop();
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.camera),
+                  title: Text('Camera'),
+                  onTap: (){
+                    _uploadImage('camera');
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            )
+          ),
+        );
+      }
+    );
+  }
+  void _uploadImage(String type) async {
 
     final _picker = ImagePicker();
-
-    var _pickedImage = await _picker.getImage(source: ImageSource.gallery);
-
-    studentStore.changeImagePath(_pickedImage.path);
+    var _pickedImage;
+    if(type=='camera')
+    { 
+      _pickedImage = await _picker.getImage(source: ImageSource.camera);
+    }
+    else
+    {
+      _pickedImage = await _picker.getImage(source: ImageSource.gallery);
+    }
+    if(_pickedImage!=null)
+       studentStore.changeImagePath(_pickedImage.path);
     
   }
 
@@ -103,11 +141,13 @@ class _UpdateStudentState extends State<UpdateStudent> {
                       child: Text('Upload image'),
                       
                     )),
-                    onPressed: _uploadImage,
+                    onPressed: (){
+                      _showPicker(context);
+                    },
                   ),
                   OutlinedButton(
                     child: Text("Update"),
-                    onPressed: onFormSubmit,
+                    onPressed: _onFormSubmit,
                   ),
                 ],
               ),
@@ -115,7 +155,6 @@ class _UpdateStudentState extends State<UpdateStudent> {
           ),
         ),
       ),
-      
     );
   }
 }

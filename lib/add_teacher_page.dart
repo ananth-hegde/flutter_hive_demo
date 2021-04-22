@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'teacher_model.dart';
 import 'package:image_picker/image_picker.dart';
+import 'teacher_store.dart';
 const teacherDbName = 'teachers';
+
+
+final teacherStore = TeacherStore();
 class AddTeacher extends StatefulWidget {
   final formKey = GlobalKey<FormState>();
   
@@ -11,14 +15,13 @@ class AddTeacher extends StatefulWidget {
 }
 
 class _AddTeacherState extends State<AddTeacher> {
-  String name;
-  String description;
-  String pathToImage;
+  
   void onFormSubmit() {
     if (widget.formKey.currentState.validate()) {
-      print(pathToImage);
+      
       Box<Teacher> teacherBox = Hive.box<Teacher>(teacherDbName);
-      teacherBox.add(Teacher(name, description,pathToImage));
+      teacherBox.add(Teacher(teacherStore.name, teacherStore.description,teacherStore.
+      pathToImage));
       Navigator.of(context).pop();
     }
   }
@@ -28,9 +31,9 @@ class _AddTeacherState extends State<AddTeacher> {
 
     var _pickedImage = await _picker.getImage(source: ImageSource.gallery);
 
-    setState(() {
-      pathToImage = _pickedImage.path;      
-    });
+    
+
+    teacherStore.changeImagePath(_pickedImage.path);
     
   }
   @override
@@ -53,9 +56,7 @@ class _AddTeacherState extends State<AddTeacher> {
                       labelText: "Name",
                     ),
                     onChanged: (value) {
-                      setState(() {
-                        name = value;
-                      });
+                      teacherStore.changeName(value);
                     },
                   ),
                   TextFormField(
@@ -64,9 +65,7 @@ class _AddTeacherState extends State<AddTeacher> {
                       labelText: "Description",
                     ),
                     onChanged: (value) {
-                      setState(() {
-                        description = value;
-                      });
+                      teacherStore.changeDescription(value);
                     },
                   ),
                   TextButton(

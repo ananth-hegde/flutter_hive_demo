@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
+import 'student_store.dart';
 import 'student_model.dart';
 const studentDbName = 'students';
+final studentStore = StudentStore();
 class UpdateStudent extends StatefulWidget {
   final formKey = GlobalKey<FormState>();
   final index;
@@ -14,18 +16,15 @@ class UpdateStudent extends StatefulWidget {
 class _UpdateStudentState extends State<UpdateStudent> {
   
   Box<Student> studentBox = Hive.box<Student>(studentDbName);
-  String name;
-  String description;
-  String pathToImage;
   @override
   initState(){
     super.initState();
-    name = studentBox.getAt(widget.index).name;
-    description = studentBox.getAt(widget.index).description;
-    pathToImage = studentBox.getAt(widget.index).pathToImage;
+    studentStore.name = studentBox.getAt(widget.index).name;
+    studentStore.description = studentBox.getAt(widget.index).description;
+    studentStore.pathToImage = studentBox.getAt(widget.index).pathToImage;
   }
   onFormSubmit(){
-    studentBox.putAt(widget.index,Student(name,description,pathToImage));
+    studentBox.putAt(widget.index,Student(studentStore.name,studentStore.description,studentStore.pathToImage));
     Navigator.of(context).pop();
   }
 
@@ -35,9 +34,7 @@ class _UpdateStudentState extends State<UpdateStudent> {
 
     var _pickedImage = await _picker.getImage(source: ImageSource.gallery);
 
-    setState(() {
-      pathToImage = _pickedImage.path;      
-    });
+    studentStore.changeImagePath(_pickedImage.path);
     
   }
 
@@ -55,25 +52,21 @@ class _UpdateStudentState extends State<UpdateStudent> {
                 children: <Widget>[
                   TextFormField(
                     autofocus: true,
-                    initialValue: name,
+                    initialValue: studentStore.name,
                     decoration: const InputDecoration(
                       labelText: "Name",
                     ),
                     onChanged: (value) {
-                      setState(() {
-                        name = value;
-                      });
+                      studentStore.changeName(value);
                     },
                   ),
                   TextFormField(
-                    initialValue: description,
+                    initialValue: studentStore.description,
                     decoration: const InputDecoration(
                       labelText: "Description",
                     ),
                     onChanged: (value) {
-                      setState(() {
-                        description = value;
-                      });
+                      studentStore.changeDescription(value);
                     },
                   ),
                   TextButton(

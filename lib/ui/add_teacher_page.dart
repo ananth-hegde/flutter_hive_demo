@@ -1,45 +1,43 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import '../models/teacher_model.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'dart:io';
-import 'student_store.dart';
-import 'student_model.dart';
-const studentDbName = 'students';
-final studentStore = StudentStore();
-class UpdateStudent extends StatefulWidget {
+import '../repositories/teacher_store.dart';
+const teacherDbName = 'teachers';
+
+
+final teacherStore = TeacherStore();
+class AddTeacher extends StatefulWidget {
   final formKey = GlobalKey<FormState>();
-  final index;
-  UpdateStudent({Key key, @required this.index}) : super(key: key);
+  
   @override
-  _UpdateStudentState createState() => _UpdateStudentState();
+  _AddTeacherState createState() => _AddTeacherState();
 }
 
-class _UpdateStudentState extends State<UpdateStudent> {
+class _AddTeacherState extends State<AddTeacher> {
   
-  Box<Student> studentBox = Hive.box<Student>(studentDbName);
-  @override
-  initState(){
-    super.initState();
-    studentStore.name = studentBox.getAt(widget.index).name;
-    studentStore.description = studentBox.getAt(widget.index).description;
-    studentStore.pathToImage = studentBox.getAt(widget.index).pathToImage;
+  void onFormSubmit() {
+    if (widget.formKey.currentState.validate()) {
+      
+      Box<Teacher> teacherBox = Hive.box<Teacher>(teacherDbName);
+      teacherBox.add(Teacher(teacherStore.name, teacherStore.description,teacherStore.
+      pathToImage));
+      Navigator.of(context).pop();
+    }
   }
-  onFormSubmit(){
-    studentBox.putAt(widget.index,Student(studentStore.name,studentStore.description,studentStore.pathToImage));
-    Navigator.of(context).pop();
-  }
-
   void _uploadImage() async {
 
     final _picker = ImagePicker();
 
     var _pickedImage = await _picker.getImage(source: ImageSource.gallery);
 
-    studentStore.changeImagePath(_pickedImage.path);
+    
+
+    teacherStore.changeImagePath(_pickedImage.path);
     
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,37 +49,38 @@ class _UpdateStudentState extends State<UpdateStudent> {
               padding: const EdgeInsets.all(8.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
                   TextFormField(
                     autofocus: true,
-                    initialValue: studentStore.name,
+                    initialValue: "",
                     decoration: const InputDecoration(
                       labelText: "Name",
                     ),
                     onChanged: (value) {
-                      studentStore.changeName(value);
+                      teacherStore.changeName(value);
                     },
                   ),
                   TextFormField(
-                    initialValue: studentStore.description,
+                    initialValue: "",
                     decoration: const InputDecoration(
                       labelText: "Description",
                     ),
                     onChanged: (value) {
-                      studentStore.changeDescription(value);
+                      teacherStore.changeDescription(value);
                     },
                   ),
                   Observer(
                     builder: (_){
-                      if(studentStore.pathToImage!=null)
+                      if(teacherStore.pathToImage!=null)
                       {
-                        File f = File(studentStore.pathToImage);
+                        File f = File(teacherStore.pathToImage);
                       print(f.existsSync());
                         if(f.existsSync()==true)
                         {
                           return Center(
                             child: Image.file(
-                                    File(studentStore.pathToImage),
+                                    File(teacherStore.pathToImage),
                                     fit: BoxFit.cover,
                                     height: 150.0,
                                     width: 150.0,
@@ -109,7 +108,7 @@ class _UpdateStudentState extends State<UpdateStudent> {
                     onPressed: _uploadImage,
                   ),
                   OutlinedButton(
-                    child: Text("Update"),
+                    child: Text("Submit"),
                     onPressed: onFormSubmit,
                   ),
                 ],

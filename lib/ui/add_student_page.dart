@@ -1,46 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
-import 'teacher_model.dart';
 import 'package:image_picker/image_picker.dart';
+import '../models/student_model.dart';
+import '../repositories/student_store.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'dart:io';
-import 'teacher_store.dart';
-const teacherDbName = 'teachers';
 
-final teacherStore = TeacherStore();
-
-class UpdateTeacher extends StatefulWidget {
+const studentDbName = 'students';
+final studentStore = StudentStore();
+class AddStudent extends StatefulWidget {
   final formKey = GlobalKey<FormState>();
-  final index;
-  UpdateTeacher({Key key, @required this.index}) : super(key: key);
   @override
-  _UpdateTeacherState createState() => _UpdateTeacherState();
+  _AddStudentState createState() => _AddStudentState();
 }
 
-class _UpdateTeacherState extends State<UpdateTeacher> {
-  
-  Box<Teacher> teacherBox = Hive.box<Teacher>(teacherDbName);
-  
-  @override
-  initState(){
-    super.initState();
-    teacherStore.name = teacherBox.getAt(widget.index).name;
-    teacherStore.description = teacherBox.getAt(widget.index).description;
-    teacherStore.pathToImage = teacherBox.getAt(widget.index).pathToImage;
+class _AddStudentState extends State<AddStudent> {
+  void onFormSubmit() {
+    if (widget.formKey.currentState.validate()) {
+      Box<Student> studentBox = Hive.box<Student>(studentDbName);
+      studentBox.add(Student(studentStore.name, studentStore.description,studentStore.pathToImage));
+      Navigator.of(context).pop();
+    }
   }
-  onFormSubmit(){
-
-    teacherBox.putAt(widget.index,Teacher(teacherStore.name,teacherStore.description,teacherStore.pathToImage));
-    Navigator.of(context).pop();
-  }
-
   void _uploadImage() async {
 
     final _picker = ImagePicker();
 
     var _pickedImage = await _picker.getImage(source: ImageSource.gallery);
 
-    teacherStore.changeImagePath(_pickedImage.path);
+    studentStore.changeImagePath(_pickedImage.path);
     
   }
   @override
@@ -54,37 +42,39 @@ class _UpdateTeacherState extends State<UpdateTeacher> {
               padding: const EdgeInsets.all(8.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
                   TextFormField(
                     autofocus: true,
-                    initialValue: teacherStore.name,
+                    initialValue: "",
                     decoration: const InputDecoration(
                       labelText: "Name",
                     ),
                     onChanged: (value) {
-                      teacherStore.changeName(value);
+                      studentStore.changeName(value);
                     },
                   ),
                   TextFormField(
-                    initialValue: teacherStore.description,
+                    initialValue: "",
                     decoration: const InputDecoration(
                       labelText: "Description",
                     ),
                     onChanged: (value) {
-                      teacherStore.changeDescription(value);
+                        studentStore.changeDescription(value);
+                      
                     },
                   ),
                   Observer(
                     builder: (_){
-                      if(teacherStore.pathToImage!=null)
+                      if(studentStore.pathToImage!=null)
                       {
-                        File f = File(teacherStore.pathToImage);
+                        File f = File(studentStore.pathToImage);
                       print(f.existsSync());
                         if(f.existsSync()==true)
                         {
                           return Center(
                             child: Image.file(
-                                    File(teacherStore.pathToImage),
+                                    File(studentStore.pathToImage),
                                     fit: BoxFit.cover,
                                     height: 150.0,
                                     width: 150.0,
@@ -112,7 +102,7 @@ class _UpdateTeacherState extends State<UpdateTeacher> {
                     onPressed: _uploadImage,
                   ),
                   OutlinedButton(
-                    child: Text("Update"),
+                    child: Text("Submit"),
                     onPressed: onFormSubmit,
                   ),
                 ],

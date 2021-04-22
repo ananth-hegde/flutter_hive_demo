@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
+import 'dart:io';
 import 'student_store.dart';
 import 'student_model.dart';
 const studentDbName = 'students';
@@ -68,6 +70,35 @@ class _UpdateStudentState extends State<UpdateStudent> {
                     onChanged: (value) {
                       studentStore.changeDescription(value);
                     },
+                  ),
+                  Observer(
+                    builder: (_){
+                      if(studentStore.pathToImage!=null)
+                      {
+                        File f = File(studentStore.pathToImage);
+                      print(f.existsSync());
+                        if(f.existsSync()==true)
+                        {
+                          return Center(
+                            child: Image.file(
+                                    File(studentStore.pathToImage),
+                                    fit: BoxFit.cover,
+                                    height: 150.0,
+                                    width: 150.0,
+                                    
+                                  ),
+                          );
+                        }
+                        else
+                        return Container(
+                          child: Text(''),
+                        );
+                      }
+                      else
+                        return Container(
+                          child: Text(''),
+                        );
+                    }
                   ),
                   TextButton(
                     child: Center(child: Padding(

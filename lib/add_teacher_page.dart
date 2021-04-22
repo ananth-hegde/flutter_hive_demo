@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'teacher_model.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
+import 'dart:io';
 import 'teacher_store.dart';
 const teacherDbName = 'teachers';
 
@@ -67,6 +69,35 @@ class _AddTeacherState extends State<AddTeacher> {
                     onChanged: (value) {
                       teacherStore.changeDescription(value);
                     },
+                  ),
+                  Observer(
+                    builder: (_){
+                      if(teacherStore.pathToImage!=null)
+                      {
+                        File f = File(teacherStore.pathToImage);
+                      print(f.existsSync());
+                        if(f.existsSync()==true)
+                        {
+                          return Center(
+                            child: Image.file(
+                                    File(teacherStore.pathToImage),
+                                    fit: BoxFit.cover,
+                                    height: 150.0,
+                                    width: 150.0,
+                                    
+                                  ),
+                          );
+                        }
+                        else
+                        return Container(
+                          child: Text(''),
+                        );
+                      }
+                      else
+                        return Container(
+                          child: Text(''),
+                        );
+                    }
                   ),
                   TextButton(
                     child: Center(child: Padding(

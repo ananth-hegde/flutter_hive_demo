@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-
-import 'package:image_picker/image_picker.dart';
-import '../repositories/student_store.dart';
+import 'functions.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'dart:io';
 
-final studentStore = StudentStore();
 
 class AddStudent extends StatefulWidget {
   final formKey = GlobalKey<FormState>();
@@ -14,59 +11,20 @@ class AddStudent extends StatefulWidget {
 }
 
 class _AddStudentState extends State<AddStudent> {
+  var studentStore,helper;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    helper = Helper();
+    studentStore = helper.studentStore;
+  }
   void onFormSubmit() {
     if (widget.formKey.currentState.validate()) {
       studentStore.addStudent();
       Navigator.of(context).pop();
     }
   }
-  
-  void _showPicker(context){
-    showModalBottomSheet(
-      context: context, 
-      builder: (BuildContext _){
-        return SafeArea(
-          child: Container(
-            child: Wrap(
-              children: <Widget>[
-                ListTile(
-                  leading: Icon(Icons.photo_library),
-                  title: Text('Gallery'),
-                  onTap: (){
-                    _uploadImage('gallery');
-                    Navigator.of(context).pop();
-                  },
-                ),
-                ListTile(
-                  leading: Icon(Icons.camera),
-                  title: Text('Camera'),
-                  onTap: (){
-                    _uploadImage('camera');
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
-            )
-          ),
-        );
-      }
-    );
-  }
-  void _uploadImage(String type) async {
-    var _pickedImage;
-    
-    final _picker = ImagePicker();
-    if(type=='camera')
-    {
-      _pickedImage = await _picker.getImage(source: ImageSource.camera);
-    }
-    else{
-      _pickedImage = await _picker.getImage(source: ImageSource.gallery);
-    }
-    if(_pickedImage!=null)
-      studentStore.changeImagePath(_pickedImage.path);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -128,7 +86,7 @@ class _AddStudentState extends State<AddStudent> {
                       child: Text('Upload image'),
                     )),
                     onPressed: (){
-                      _showPicker(context);
+                      helper.showPicker(context,'student');
                     },
                   ),
                   OutlinedButton(

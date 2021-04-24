@@ -3,8 +3,7 @@ import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../models/teacher_model.dart';
 import 'dart:io';
-import 'add_teacher_page.dart';
-import 'update_teacher_page.dart';
+import 'add_update_teacher_page.dart';
 
 const teacherDbName = 'teachers';
 
@@ -72,7 +71,7 @@ class _TeacherPageState extends State<TeacherPage> {
                             onPressed: () {
                               Navigator.of(context).push(MaterialPageRoute(
                                   builder: (context) =>
-                                      UpdateTeacher(index: index)));
+                                      AddUpdateTeacher('update',index: index)));
                             },
                             child: Icon(Icons.edit),
                           ),
@@ -95,7 +94,7 @@ class _TeacherPageState extends State<TeacherPage> {
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
         onPressed: (){
-          Navigator.of(context).push(MaterialPageRoute(builder: (context)=>AddTeacher()));
+          Navigator.of(context).push(MaterialPageRoute(builder: (context)=>AddUpdateTeacher('add')));
         },
       ),
     );

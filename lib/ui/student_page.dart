@@ -3,8 +3,7 @@ import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../models/student_model.dart';
 import 'dart:io';
-import 'add_student_page.dart';
-import 'update_student_page.dart';
+import 'add_update_student_page.dart';
 
 const studentDbName = 'students';
 
@@ -59,12 +58,12 @@ class _StudentPageState extends State<StudentPage> {
                                 ),
                               ),
                               SizedBox(height: 5),
-                              Image.file(
+                              currentStudent.pathToImage!=null?Image.file(
                                 File(currentStudent.pathToImage),
                                 fit: BoxFit.cover,
                                 height: 150.0,
                                 width: 150.0,
-                              ),
+                              ):Container(),
                               SizedBox(height: 5),
                             ],
                           ),
@@ -72,7 +71,7 @@ class _StudentPageState extends State<StudentPage> {
                             onPressed: () {
                               Navigator.of(context).push(MaterialPageRoute(
                                   builder: (context) =>
-                                      UpdateStudent(index: index)));
+                                      AddUpdateStudent('update',index: index)));
                             },
                             child: Icon(Icons.edit),
                           ),
@@ -95,7 +94,7 @@ class _StudentPageState extends State<StudentPage> {
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
         onPressed: (){
-          Navigator.of(context).push(MaterialPageRoute(builder: (context)=>AddStudent()));
+          Navigator.of(context).push(MaterialPageRoute(builder: (context)=>AddUpdateStudent('add')));
         },
       ),
     );

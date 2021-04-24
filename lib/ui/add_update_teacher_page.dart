@@ -2,28 +2,42 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'dart:io';
 import 'functions.dart';
-const studentDbName = 'students';
-class UpdateStudent extends StatefulWidget {
+class AddUpdateTeacher extends StatefulWidget {
   final formKey = GlobalKey<FormState>();
-  final index;
-  UpdateStudent({Key key, @required this.index}) : super(key: key);
+  final int index;
+  final String addOrUpdate;
+  AddUpdateTeacher(this.addOrUpdate,{this.index});
   @override
-  _UpdateStudentState createState() => _UpdateStudentState();
+  _AddUpdateTeacherState createState() => _AddUpdateTeacherState();
 }
 
-class _UpdateStudentState extends State<UpdateStudent> {
-  var studentStore,helper;
+class _AddUpdateTeacherState extends State<AddUpdateTeacher> {
+  var helper,teacherStore,buttonText;
   @override
-  initState(){
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     helper = Helper();
-    studentStore = helper.studentStore;
-    studentStore.setDataFromIndex(widget.index);
+    teacherStore = helper.teacherStore;
+    if(widget.addOrUpdate=='add')
+    {
+      buttonText = 'Add';
+    }
+    else
+    {
+      buttonText = 'Update';
+      teacherStore.setDataFromIndex(widget.index);
+    }
   }
-  _onFormSubmit(){
-    studentStore.updateStudent(widget.index);
-    Navigator.of(context).pop();
+  void onFormSubmit() {
+    if (widget.formKey.currentState.validate()) {
+      if(widget.addOrUpdate=='add')
+        teacherStore.addTeacher();
+      else
+        teacherStore.updateTeacher(widget.index);
+      Navigator.of(context).pop();
+    }
   }
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,37 +49,37 @@ class _UpdateStudentState extends State<UpdateStudent> {
               padding: const EdgeInsets.all(8.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
                   TextFormField(
                     autofocus: true,
-                    initialValue: studentStore.name,
+                    initialValue: teacherStore.name,
                     decoration: const InputDecoration(
                       labelText: "Name",
                     ),
                     onChanged: (value) {
-                      studentStore.changeName(value);
+                      teacherStore.changeName(value);
                     },
                   ),
                   TextFormField(
-                    initialValue: studentStore.description,
+                    initialValue: teacherStore.description,
                     decoration: const InputDecoration(
                       labelText: "Description",
                     ),
                     onChanged: (value) {
-                      studentStore.changeDescription(value);
+                      teacherStore.changeDescription(value);
                     },
                   ),
                   Observer(
                     builder: (_){
-                      if(studentStore.pathToImage!=null)
+                      if(teacherStore.pathToImage!=null)
                       {
-                        File f = File(studentStore.pathToImage);
-                      print(f.existsSync());
+                        File f = File(teacherStore.pathToImage);
                         if(f.existsSync()==true)
                         {
                           return Center(
                             child: Image.file(
-                                    File(studentStore.pathToImage),
+                                    File(teacherStore.pathToImage),
                                     fit: BoxFit.cover,
                                     height: 150.0,
                                     width: 150.0,
@@ -91,12 +105,12 @@ class _UpdateStudentState extends State<UpdateStudent> {
                       
                     )),
                     onPressed: (){
-                      helper.showPicker(context,'student');
+                      helper.showPicker(context,'teacher');
                     },
                   ),
                   OutlinedButton(
-                    child: Text("Update"),
-                    onPressed: _onFormSubmit,
+                    child: Text(buttonText),
+                    onPressed: onFormSubmit,
                   ),
                 ],
               ),

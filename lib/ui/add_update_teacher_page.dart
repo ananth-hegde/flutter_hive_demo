@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'dart:io';
 import 'functions.dart';
+import 'teacher_store.dart';
 class AddUpdateTeacher extends StatefulWidget {
   final formKey = GlobalKey<FormState>();
   final int index;
@@ -17,7 +18,7 @@ class _AddUpdateTeacherState extends State<AddUpdateTeacher> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     helper = Helper();
-    teacherStore = helper.teacherStore;
+    teacherStore = TeacherStore();
     if(widget.addOrUpdate=='add')
     {
       buttonText = 'Add';
@@ -36,6 +37,10 @@ class _AddUpdateTeacherState extends State<AddUpdateTeacher> {
         teacherStore.updateTeacher(widget.index);
       Navigator.of(context).pop();
     }
+  }
+
+  void updateImagePath(String path){
+    teacherStore.changeImagePath(path); 
   }
   
   @override
@@ -105,7 +110,7 @@ class _AddUpdateTeacherState extends State<AddUpdateTeacher> {
                       
                     )),
                     onPressed: (){
-                      helper.showPicker(context,'teacher');
+                      helper.showPicker(context,updateImagePath);
                     },
                   ),
                   OutlinedButton(

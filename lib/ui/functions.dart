@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
-import 'teacher_store.dart';
-import 'student_store.dart';
 import 'package:image_picker/image_picker.dart';
 class Helper{
-  var teacherStore = TeacherStore();
-  var studentStore = StudentStore();
   // ignore: unused_element
-  void showPicker(context,teacherOrStudent){  
+  void showPicker(context,Function updatePath){  
     showModalBottomSheet(
       context: context, 
       builder: (BuildContext _){
@@ -18,7 +14,7 @@ class Helper{
                   leading: Icon(Icons.photo_library),
                   title: Text('Gallery'),
                   onTap: (){
-                    _uploadImage('gallery',teacherOrStudent);
+                    _uploadImage('gallery',updatePath);
                     Navigator.of(context).pop();
                   },
                 ),
@@ -26,7 +22,7 @@ class Helper{
                   leading: Icon(Icons.camera),
                   title: Text('Camera'),
                   onTap: (){
-                    _uploadImage('camera',teacherOrStudent);
+                    _uploadImage('camera',updatePath);
                     Navigator.of(context).pop();
                   },
                 ),
@@ -37,13 +33,9 @@ class Helper{
       }
     );
   }
-  void _uploadImage(String type,String teacherOrStudent) async {
+  void _uploadImage(String type,Function updatePath) async {
     final _picker = ImagePicker();
-    var _pickedImage,store;
-    if(teacherOrStudent == 'teacher')
-      store = teacherStore;
-    else
-      store = studentStore;
+    var _pickedImage;
     if(type=='camera')
     {
       _pickedImage = await _picker.getImage(source: ImageSource.camera);
@@ -52,6 +44,6 @@ class Helper{
       _pickedImage = await _picker.getImage(source: ImageSource.gallery);
     }
     if(_pickedImage!=null)
-      store.changeImagePath(_pickedImage.path); 
+      updatePath(_pickedImage.path);
   }
 }

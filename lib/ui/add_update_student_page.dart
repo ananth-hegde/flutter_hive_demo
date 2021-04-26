@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'functions.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'dart:io';
-
+import 'student_store.dart';
 
 class AddUpdateStudent extends StatefulWidget {
   final String addOrUpdate;
@@ -28,7 +28,11 @@ class _AddUpdateStudentState extends State<AddUpdateStudent> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     helper = Helper();
-    studentStore = helper.studentStore;
+    studentStore = StudentStore();
+  }
+
+  void updateImagePath(String path){
+    studentStore.changeImagePath(path); 
   }
   void onFormSubmit() {
     if (widget.formKey.currentState.validate()) {
@@ -100,7 +104,7 @@ class _AddUpdateStudentState extends State<AddUpdateStudent> {
                       child: Text('Upload image'),
                     )),
                     onPressed: (){
-                      helper.showPicker(context,'student');
+                      helper.showPicker(context,updateImagePath);
                     },
                   ),
                   OutlinedButton(
